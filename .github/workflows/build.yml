@@ -121,15 +121,17 @@ jobs:
         export ANDROID_NDK_ROOT=${{ steps.setup-ndk.outputs.ndk-path }}
         git clone --recurse-submodules https://github.com/frida/frida
         cd frida
-        cd subprojects/frida-core
-        git am ../../../Patchs/strongR-frida/frida-core/0001-strongR-frida-string_frida_rpc.patch
-        git am ../../../Patchs/strongR-frida/frida-core/0002-strongR-frida-io_re_frida_server.patch
-        git am ../../../Patchs/strongR-frida/frida-core/0004-strongR-frida-io_frida_agent_so.patch
-        git am ../../../Patchs/strongR-frida/frida-core/0005-strongR-frida-symbol_frida_agent_main.patch
-        git am ../../../Patchs/strongR-frida/frida-core/0006-strongR-frida-thread_gum_js_loop.patch
-        git am ../../../Patchs/strongR-frida/frida-core/0007-strongR-frida-thread_gmain.patch
-        git am ../../../Patchs/strongR-frida/frida-core/0001-strongR-frida-protocol_unexpected_command.patch
-        cd ../../..
+        for path in ../Patchs/strongR-frida/*
+        do
+          name=$(basename $path)
+          real=$(realpath $path)
+          echo "Apply patches in $real to frida/subprojects/$name"
+          cd subprojects/$name
+          git am ../../../Patchs/strongR-frida/$name/*.patch
+          cd ../..
+          echo $i
+        done
+        cd ..
         
         ARCHES="android-arm android-arm64 android-x86 android-x86_64"
         for ARCH in $ARCHES
